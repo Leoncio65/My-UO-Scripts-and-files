@@ -51,10 +51,10 @@ def ResetCounters():
         "agapite", "bronze", "verite", "valorite"
     ]
     gems = [
-        "sapphire", "ruby", "emerald", "diamond", "citrine", "amethyst",
-        "star_sapphire", "tourmaline", "turquoise", "blue_diamond",
-        "perfect_emerald", "ecru_citrine", "fire_ruby", "dark_sapphire",
-        "crystalline_blackrock", "blackrock_piece", "amber"
+        "citrine", "emerald", "tourmaline", "diamond", "sapphire",
+        "star_sapphire", "ruby", "amber", "amethyst", "ecru_citrine",
+        "perfect_emerald", "turquoise", "blue_diamond", "dark_sapphire",
+        "fire_ruby", "crystalline_blackrock", "blackrock_piece"
     ]
     for ingot in ingots:
         Misc.SetSharedValue("ingot_" + ingot, 0)
@@ -218,7 +218,7 @@ def Mine():
         else:
             Player.HeadMessage(colors["red"], "")
 
-        if Player.Weight > Player.MaxWeight:
+        if Player.Weight + 50 > Player.MaxWeight:
             Misc.SendMessage("", colors["cyan"])
             SmeltOres()
             if Player.Weight + 176 >= Player.MaxWeight:
