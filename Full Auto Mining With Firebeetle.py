@@ -116,11 +116,10 @@ def SmeltOres():
 
 def TrackGems():
     gem_ids = {
-        0x0F11: "sapphire", 0x0F13: "ruby", 0x0F10: "emerald", 0x0F26: "diamond",
-        0x0F15: "citrine", 0x0F16: "amethyst", 0x0F0F: "star_sapphire", 0x0F18: "tourmaline",
-        0x3193: "turquoise", 0x3198: "blue_diamond", 0x3194: "perfect_emerald",
-        0x3195: "ecru_citrine", 0x3197: "fire_ruby", 0x3192: "dark_sapphire",
-        0x5732: "crystalline_blackrock", 0x0F28: "blackrock_piece", 0x0F25: "amber",
+        0x0F15: "citrine", 0x0F10: "emerald", 0x0F18: "tourmaline", 0x0F26: "diamond", 0x0F11: "sapphire",
+        0x0F0F: "star_sapphire", 0x0F13: "ruby", 0x0F25: "amber", 0x0F16: "amethyst", 0x3195: "ecru_citrine",
+        0x3194: "perfect_emerald", 0x3193: "turquoise", 0x3198: "blue_diamond", 0x3192: "dark_sapphire",
+        0x3197: "fire_ruby", 0x5732: "crystalline_blackrock", 0x0F28: "blackrock_piece"
     }
 
     global last_gem_state
