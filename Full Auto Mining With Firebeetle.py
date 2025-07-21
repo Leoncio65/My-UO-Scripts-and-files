@@ -170,10 +170,10 @@ def UpdateStatusGump():
     # 💎 Gems section
     Gumps.AddLabel(gump, 185, 60, 1152, "💎 Gems:")
     gems = [
-        "sapphire", "ruby", "emerald", "diamond", "citrine", "amethyst",
-        "star_sapphire", "tourmaline", "turquoise", "blue_diamond",
-        "perfect_emerald", "ecru_citrine", "fire_ruby", "dark_sapphire",
-        "crystalline_blackrock", "blackrock_piece", "amber"
+        "citrine", "emerald", "tourmaline", "diamond", "sapphire",
+        "star_sapphire", "ruby", "amber", "amethyst", "ecru_citrine",
+        "perfect_emerald", "turquoise", "blue_diamond", "dark_sapphire",
+        "fire_ruby", "crystalline_blackrock", "blackrock_piece"
     ]
     y_gem = 80
     for gem in gems:
