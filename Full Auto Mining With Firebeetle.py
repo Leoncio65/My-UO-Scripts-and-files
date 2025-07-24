@@ -10,9 +10,9 @@ import threading
 # As you start the script, it will have you select your firebeetle then your 2 mining atlas. 
 
 # you will need to place the serial numbers for your secure chest and your 2 runes into the script. 
-# Enter Chest Serial Number on line 417
-# Enter Home Drop Off Rune Serial Number on line 457
-# Enter Safe Place Rune (this is where you were mining when you need to drop off) on line 456
+# Enter Chest Serial Number on line 468
+# Enter Home Drop Off Rune Serial Number on line 508
+# Enter Safe Place Rune (this is where you were mining when you need to drop off) on line 507
 
 
          
@@ -44,6 +44,8 @@ ore_colors = [
 # Snapshot containers for tracking cumulative gains
 last_ingot_state = {}
 last_gem_state = {}
+last_granite_state = {}
+
 
 def ResetCounters():
     ingots = [
@@ -56,10 +58,17 @@ def ResetCounters():
         "perfect_emerald", "turquoise", "blue_diamond", "dark_sapphire",
         "fire_ruby", "crystalline_blackrock", "blackrock_piece"
     ]
+    granites = [
+        "iron", "dull_copper", "shadow_iron", "copper", "golden",
+        "agapite", "bronze", "verite", "valorite"
+    ]
+
     for ingot in ingots:
         Misc.SetSharedValue("ingot_" + ingot, 0)
     for gem in gems:
         Misc.SetSharedValue("gem_" + gem, 0)
+    for granite in granites:
+        Misc.SetSharedValue("granite_" + granite, 0)
 
 def TrackIngotSmelts():
     ingot_ids = {
@@ -137,6 +146,39 @@ def TrackGems():
 
     last_gem_state = current_gem_state
 
+def TrackGranite():
+    global last_granite_state
+    current_granite_state = {}
+
+    granite_ids = {
+        0x1779: {
+            0x0000: "iron",
+            0x0973: "dull_copper",
+            0x0966: "shadow_iron",
+            0x096d: "copper",
+            0x0972: "bronze",
+            0x08a5: "golden",
+            0x0979: "agapite",
+            0x089f: "verite",
+            0x08ab: "valorite"
+        }
+    }
+
+    for item in Player.Backpack.Contains:
+        if item.ItemID == 0x1779:
+            type_name = granite_ids[0x1779].get(item.Hue)
+            if type_name:
+                current_granite_state[type_name] = current_granite_state.get(type_name, 0) + item.Amount
+
+    for name, current_amt in current_granite_state.items():
+        previous_amt = last_granite_state.get(name, 0)
+        mined_amt = max(0, current_amt - previous_amt)
+        Misc.SetSharedValue("granite_" + name, Misc.ReadSharedValue("granite_" + name) + mined_amt)
+
+    last_granite_state = current_granite_state
+
+
+
 def UpdateStatusGump():
     atlas_index = Misc.ReadSharedValue("current_book")
     rune_index = Misc.ReadSharedValue("recall_rune_index")
@@ -168,18 +210,27 @@ def UpdateStatusGump():
         y_ingot += 20
 
     # 💎 Gems section
+        # 💎 Gems section
     Gumps.AddLabel(gump, 185, 60, 1152, "💎 Gems:")
     gems = [
         "citrine", "emerald", "tourmaline", "diamond", "sapphire",
-        "star_sapphire", "ruby", "amber", "amethyst", "ecru_citrine",
-        "perfect_emerald", "turquoise", "blue_diamond", "dark_sapphire",
-        "fire_ruby", "crystalline_blackrock", "blackrock_piece"
+        "star_sapphire", "ruby", "amber", "amethyst",  # ← First group
+        "ecru_citrine", "perfect_emerald", "turquoise", "blue_diamond",
+        "dark_sapphire", "fire_ruby", "crystalline_blackrock", "blackrock_piece"
     ]
+
+    # Define where the color break happens
+    split_index = gems.index("amethyst") + 1  # Include "amethyst" in first group
+
+    color_A = 88  # Soft blue-gray for group one
+    color_B = 92  # Cyan for remaining gems
+
     y_gem = 80
-    for gem in gems:
+    for i, gem in enumerate(gems):
         val = Misc.ReadSharedValue("gem_" + gem)
         label = gem.replace("_", " ").title()
-        Gumps.AddLabel(gump, 185, y_gem, 33, f"{label}: {val}")
+        display_color = color_A if i < split_index else color_B
+        Gumps.AddLabel(gump, 185, y_gem, display_color, f"{label}: {val}")
         y_gem += 20
 
     # 🧱 Granite section (beneath ingots)
@@ -205,7 +256,7 @@ def Mine():
         "Target cannot be seen.",
         "You can't mine there."
     ]):
-        if Player.Weight <= Player.MaxWeight:
+        if Player.Weight + 50 <= Player.MaxWeight:
             pickaxe = PreparePickaxe()
             Target.TargetResource(pickaxe, 0)
             Misc.Pause(300)
@@ -214,6 +265,7 @@ def Mine():
                 break
             Misc.Pause(500)
             TrackGems()
+            TrackGranite()
         else:
             Player.HeadMessage(colors["red"], "")
 
@@ -495,7 +547,7 @@ def Beetle():
     return beetle
 
 # 🏁 Startup routine
-ResetCounters()
+#ResetCounters()
 PrepareGumps()
 Beetle()
 Book(1)
