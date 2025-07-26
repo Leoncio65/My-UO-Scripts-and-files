@@ -1,6 +1,19 @@
 from Scripts.utilities.items import FindItem, FindNumberOfItems, MoveItem
 from Scripts.glossary.colors import colors
-import time
+
+# DO NOT USE AFK!!!!!!!!!!!!!!!!
+# Have 2 TinkerTools, 2 Pickaxe and about 100 iron ingots or as many as you need to stay out 
+# as Sand does not weigh that much in the top layer of your backpack.
+# You will need 2 FULL RUNIC ATLAS filled with mining recall locations. You also need 2 runes
+# in the top layer of your backpack, One of these should be marked while standing next to your
+# secured chest you have placed on the steps of your house. 
+
+# As you start the script, it will have you select your 2 mining atlas. 
+
+# you will need to place the serial numbers for your secure chest and your 2 runes into the script. 
+# Enter Chest Serial Number on line 158
+# Enter Home Drop Off Rune Serial Number on line 166
+# Enter Safe Place Rune (this is where you were mining when you need to drop off) on line 165
 
 Misc.SetSharedValue("sand_amount", 0)
 
@@ -141,26 +154,55 @@ def Mine():
             Misc.SendMessage("Too heavy to continue mining.", colors["red"])
             break
         Misc.Pause(500)
+        
+def DepositSand():
+    chest_serial = 0x4015307F  # <-- Replace with your actual container serial
+    sand_items = Items.FindAllByID([0x423A], -1, Player.Backpack.Serial, -1)
+    for sand in sand_items:
+        Items.Move(sand, chest_serial, 0)
+        Misc.Pause(500)
+
+def RecallAndDump():
+    safe_rune = 0x4055ABEA  # <-- Rune to return to mining spot
+    drop_rune = 0x40AB5671  # <-- Rune for secure chest
+
+    # 🪄 Mark safe spot for return
+    Spells.CastMagery("Mark")
+    Target.WaitForTarget(5000, False)
+    Target.TargetExecute(safe_rune)
+    Misc.Pause(3000)
+
+    # 🔁 Recall to drop point
+    Spells.CastMagery("Recall")
+    Target.WaitForTarget(5000, False)
+    Target.TargetExecute(drop_rune)
+    Misc.Pause(5000)
+
+    DepositSand()
+    Misc.Pause(1000)
+
+    # 🔁 Recall back to safe spot
+    Spells.CastMagery("Recall")
+    Target.WaitForTarget(5000, False)
+    Target.TargetExecute(safe_rune)
+    Misc.Pause(1500)
 
 # 🏁 Startup Sequence
 PrepareGumps()
 Book(1)
 Book(2)
 
-try:
-    while Player.Hits > 0:
-        index = Misc.ReadSharedValue("recall_rune_index")
-        if index == 0 or index == 48:
-            index = 1
-            SwitchBook()
-        else:
-            index += 1
+while Player.Hits > 0:
+    index = Misc.ReadSharedValue("recall_rune_index")
 
-        Misc.SetSharedValue("recall_rune_index", index)
-        Misc.Pause(500)
-        RecallToMine(index)
-        Mine()
-        Misc.Pause(350)
-
-finally:
-    Misc.SetSharedValue("gump_loop_active", False)
+    if index == 0 or index > 48:
+        index = 1
+        SwitchBook()  # Flip to the other book after finishing all 48 runes
+    else:
+        index += 1
+        
+    Misc.SetSharedValue("recall_rune_index", index)
+    Misc.Pause(500)
+    RecallToMine(index)
+    Mine()
+    Misc.Pause(250)
