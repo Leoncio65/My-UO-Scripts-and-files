@@ -504,8 +504,8 @@ def DepositItems():
             Misc.Pause(1000)
 
 def RecallAndDump():
-    SafePlaceRune = 0x4055ABEA
-    StoreOresRune = 0x40AB5671
+    SafePlaceRune = 0x592E75FD
+    StoreOresRune = 0x419A7E00
     #Player.HeadMessage(colors['green'], "Time to drop off some weight!")
     #CreatePickaxe()
 
